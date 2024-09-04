@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>emotion recognition system</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" type="image/png" sizes="16x16" href="static/img/favicon-16x16.png">
+</head>
+<body>
+    <div class="spinner-container" id="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <h1>emotion recognition system</h1>
+    <div class="video-container">
+        <img id="video-feed" src="{{ url_for('video_feed') }}">
+    </div>
+    <div id="emotionContainer">
+        <h2>emotion history</h2>
+        <div id="setEmoDTList"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoFeed = document.getElementById('video-feed');
+            const videoContainer = document.getElementById('video-container');
+            const loadingSpinner = document.getElementById('loading-spinner');
+
+            // Function to handle successful video feed load
+            videoFeed.onload = function() {
+                loadingSpinner.style.display = 'none';
+                videoFeed.style.display = 'block';
+            };
+
+            // Function to handle video feed error
+            videoFeed.onerror = function() {
+                // Keep the spinner or show an error message if the feed fails to load
+                loadingSpinner.innerHTML = '<div class="alert alert-danger" role="alert">Failed to load video feed.</div>';
+            };
+
+            // Set a timeout to handle cases where the video feed doesn't load in a reasonable time
+            setTimeout(function() {
+                if (videoFeed.style.display === 'none') {
+                    loadingSpinner.innerHTML = '<div class="alert alert-danger" role="alert">Video feed is taking too long to load.</div>';
+                }
+            }, 10000);  // 10 seconds timeout
+        });
+
+        function updateEmotionList(emotion, timestamp) {
+            // Get the existing emotions from localStorage
+            let emotions = JSON.parse(localStorage.getItem('emotions')) || [];
+
+            // Add the new emotion and timestamp to the list
+            emotions.push({ emotion: emotion, timestamp: timestamp });
+
+            // Keep only the last 10 emotions
+            if (emotions.length > 10) {
+                emotions.shift();
+            }
+
+            // Save the updated list back to localStorage
+            localStorage.setItem('emotions', JSON.stringify(emotions));
+
+            // Update the displayed list
+            displayEmotions();
+        }
+
+        function displayEmotions() {
+            let emotions = JSON.parse(localStorage.getItem('emotions')) || [];
+            setEmoDTList.innerHTML = '';
+            // console.log()
+            emotions.forEach(emotionEntry => {
+                let setEmoDTListItem = document.createElement('div');
+                let emotionListItem = document.createElement('div');
+                let datetimeListItem = document.createElement('div');
+
+                setEmoDTListItem.classList.add('setEmoDT-item')
+                emotionListItem.classList.add('emotion-item');  // Add class for emotion item
+                datetimeListItem.classList.add('datetime-item');  // Add class for datetime item
+
+
+                for (let i = 0; i < 10; i++) {
+                    console.log(emotionEntry.emotion[i].emotion)
+                    console.log(emotionEntry.emotion[i].timestamp)
+                    emotionListItem.textContent = `emotion: ${emotionEntry.emotion[i].emotion}`
+                    datetimeListItem.textContent = emotionEntry.emotion[i].timestamp
+                    setEmoDTListItem.appendChild(emotionListItem);
+                    setEmoDTListItem.appendChild(datetimeListItem);
+                    setEmoDTList.appendChild(setEmoDTListItem);
+                }
+            });
+        }
+
+        // Function to fetch the emotion data from the server
+        async function fetchEmotionData() {
+            try {
+                let response = await fetch('/get_emotion_history', {
+                    method: 'POST'
+                });
+                
+                let data = await response.json();
+                
+                updateEmotionList(data);
+            } catch (error) {
+                console.error('Error fetching emotion data:', error);
+            }
+        }
+
+        // Fetch emotion data at regular intervals (e.g., every 2 seconds)
+        setInterval(fetchEmotionData, 5000);
+
+        // Display the stored emotions when the page loads
+        // window.onload = function() {
+        //   displayEmotions();
+        // }
+    </script>
+</body>
+</html>

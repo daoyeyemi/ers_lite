@@ -1,0 +1,15 @@
+runtime: python310  # Specify the Python version (e.g., python310 for Python 3.10)
+entrypoint: gunicorn -b :$PORT app:app  # Replace `main` with the name of your Flask file (without .py), and `app` with the Flask app instance name
+
+handlers:
+- url: /.*
+  script: auto 
+  
+    # <div class="button-container">
+    #     <button class="dashboard-button btn btn-warning" onclick="window.location.href='{{ url_for('show_history') }}'">show history</button>
+    #     <button class="dashboard-button btn btn-warning" onclick="window.location.href='{{ url_for('plot_emotion_distribution') }}'">show emotion distribution</button>
+    #     <button class="dashboard-button btn btn-warning" onclick="window.location.href='{{ url_for('plot_emotion_over_time') }}'">show emotions over time</button>
+    #     <button class="dashboard-button btn btn-warning" onclick="window.location.href='{{ url_for('plot_emotion_by_user') }}'">show emotions by user</button>
+    #     <button class="dashboard-button btn btn-warning" onclick="window.location.href='{{ url_for('predict_emotion_levels') }}'">show emotion level predictions</button>
+    #     <button class="logout-btn btn btn-dark" onclick="window.location.href='{{ url_for('log_out') }}'">log out</button>
+    # </div>
