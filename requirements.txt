@@ -2,4 +2,4 @@ flask
 gunicorn
 opencv-python-headless
 keras
-tensorflow-cpu-headless
+tensorflow-cpu
