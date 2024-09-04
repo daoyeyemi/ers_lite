@@ -3,16 +3,8 @@ import cv2
 import numpy as np
 from keras.models import load_model
 from keras.preprocessing.image import img_to_array
-import sqlite3
 import datetime
-import pandas as pd
-import plotly.express as px
-import plotly.io as pio
-import plotly.graph_objs as go
-# from sklearn.linear_model import LinearRegression
-# import base64
 import os
-from database_config import init_db, authenticate_user, create_user
 
 
 app = Flask(__name__)
